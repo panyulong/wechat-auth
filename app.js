@@ -15,18 +15,22 @@
   es6，新增export和export default导出模块，import导入模块。
   使用ipmort配置babel转义为es5
 */
-
 import https from 'https'; //node内置请求模块
 import express from 'express';
 import config from 'config-lite';//配置不同环境，config目录默认default,最新版本3.0获取不到信息
-import router from './routers/index';
 import history from 'connect-history-api-fallback';//前端路由设置mode:history
 import chalk from 'chalk';//颜色工具
 import bodyParser from 'body-parser'
+import router from './routers/index';
 
 const app = express();
 
+//appID
+const appID = `wx3343aa96ef214582`;
+//appsecret
+const appSerect = `655e1cc00423f8e49370c3ec5d162c27`;
 
+let tokenRes = {}
 
 //设置跨域访问
 app.all('*', function(req, res, next) {
@@ -37,16 +41,6 @@ app.all('*', function(req, res, next) {
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
-
-
-router(app);
-
-//appID
-const appID = `wx3343aa96ef214582`;
-//appsecret
-const appSerect = `655e1cc00423f8e49370c3ec5d162c27`;
-
-let tokenRes = {}
 
 app.get("/auth", function(req, res) {
     let redirectUrl = req.query.redirectUrl;
@@ -116,12 +110,10 @@ function getUserInfo(access_token, open_id) {
         });
     })
 }
-
-//只要加入这个配置，在req请求对象上会多出来一个属性
-//parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-//parse application/json
-app.use(bodyParser.json())
+//使用JSON解析工具
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+router(app);//必须放在bodyParser后面才能获取到参数
 app.use(history())
 app.listen(config.port, () => {
 	console.log(

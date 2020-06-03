@@ -6,7 +6,6 @@ class File {
 	}
 	async upload(req, res, next){
 		console.log(req.body)
-		console.log(req.query)
 	// var _files = req.files.pics;
 	// var item ,_name ,_tmp;
 	// item = _files, _name=item.name;
