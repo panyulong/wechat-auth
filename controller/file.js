@@ -1,11 +1,40 @@
-import fs from 'fs'
+
+const fs = require('fs')
+const moment = require('moment');
+
+const fileTypeFn = (mimetype) =>{
+	if(mimetype.includes('image/png')){
+		return '.png'
+	}else if(mimetype.includes('image/jpg')){
+		return '.jpg'
+	}
+}
 
 class File {
 	constructor(props) {
 
 	}
 	async upload(req, res, next){
-		console.log(req.body)
+		// fs.renameSync(req.file.path, `public/upload/${req.file.originalname}`)
+		// res.send(req.file)
+            //循环处理
+            var imgPath=[];
+            req.files.forEach(function (i) {
+                //获取临时文件的存储路径
+                imgPath.push(i.path);
+            });
+
+            //所有文件上传成功
+            //回复信息
+            var reponse = {
+				code:1,
+                msg: '上传成功',
+                imgPath
+            };
+            //返回
+            res.send(JSON.stringify(reponse));
+
+
 	// var _files = req.files.pics;
 	// var item ,_name ,_tmp;
 	// item = _files, _name=item.name;
