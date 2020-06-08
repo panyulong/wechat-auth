@@ -4,7 +4,7 @@ import moment from 'moment'
 import File from '../controller/file'
 const router = express.Router()
 
-const uploadDir = `./public/upload/${moment().format('YYYYMMDD')}`;
+const uploadDir = `./public/upload`;
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir)
@@ -15,6 +15,7 @@ var storage = multer.diskStorage({
     }
   })
 
-router.post('/upload', multer({ storage: storage  }).array('file'), File.upload); //请求路径：/file/upload
+router.post('/upload', multer({ storage: storage }).array('file'), File.upload); //请求路径：/file/upload
+router.get('/queryFile',File.queryFile)
 
 export default router

@@ -1,15 +1,4 @@
-
-const fs = require('fs')
-const moment = require('moment');
-
-const fileTypeFn = (mimetype) =>{
-	if(mimetype.includes('image/png')){
-		return '.png'
-	}else if(mimetype.includes('image/jpg')){
-		return '.jpg'
-	}
-}
-
+import models from '../models'
 class File {
 	constructor(props) {
 
@@ -17,61 +6,41 @@ class File {
 	async upload(req, res, next){
 		// fs.renameSync(req.file.path, `public/upload/${req.file.originalname}`)
 		// res.send(req.file)
-            //循环处理
-            var imgPath=[];
+		const userId = req.body.userId,current = req.body.current
+		//循环处理
+            var fileArr=[];
             req.files.forEach(function (i) {
-                //获取临时文件的存储路径
-                imgPath.push(i.path);
-            });
+				//获取临时文件的存储路径
+                fileArr.push(
+					{
+						fileUrl:i.path,
+						fileSize:i.size,
+						fileName:i.filename,
+						userId:userId,
+						current:current
+					});
+			});
+			models.file.bulkCreate(fileArr).then((data)=> {
+				res.send({
+					msg: '上传成功',
+					code: 1,
+					data: data
+				});
+			  }).catch(next);
+	}
+	async queryFile(req,res,next){
+		const userId = req.query.userId
+		models.file.findAll({
+			where: {
+				userId: `${userId}`
+			},
+		}).then(data=>{
+			res.send({
+					code:1,
+					data:data
+				})
 
-            //所有文件上传成功
-            //回复信息
-            var reponse = {
-				code:1,
-                msg: '上传成功',
-                imgPath
-            };
-            //返回
-            res.send(JSON.stringify(reponse));
-
-
-	// var _files = req.files.pics;
-	// var item ,_name ,_tmp;
-	// item = _files, _name=item.name;
-	// if (_name && item.path) {//这里须要推断文件名和路径是否为空
-	// 	var tmpPath = item.path, type = item.type ,extension_name = '',
-	// 	tmp_name = (Date.parse(new Date()) / 1000) + '' + (Math.round(Math.random() * 9999));//生成随机名称
-	// 	switch (type) {	//推断文件类型
-	// 		case 'image/pjpeg': extension_name = 'jpg';  break;
-	// 		case 'image/jpeg': extension_name = 'jpg'; break;
-	// 		case 'image/gif': extension_name = 'gif'; break;
-	// 		case 'image/png': extension_name = 'png'; break;
-	// 		case 'image/x-png': extension_name = 'png'; break;
-	// 		case 'image/bmp': extension_name = 'bmp'; break;
-	// 		default: if(_name.indexOf('.')<=0) return;//其它文件则默认上传
-	// 			else {
-	// 				_tmp = _name.split('.');
-	// 				extension_name = _tmp[_tmp.length-1]; break;
-	// 		}
-	// 	}
-	// 	tmp_name = tmp_name + '.' + extension_name,
-	// 	targetPath = 'public/upload/' + tmp_name,//设置上传路径
-	// 	is = fs.createReadStream(tmpPath),
-	// 	os = fs.createWriteStream(targetPath);
-	// 	fs.unlinkSync(tmpPath); 
-	// 		console.log('upload success : ',targetPath);
-	// 		res.json({//设置返回值
-	// 			error : 0,
-	// 			url : 'upload/' + tmp_name,
-	// 			title : tmp_name,
-	// 			message : tmp_name
-	// 		});
-	// }
-		// res.send({
-		// 	status: 0,
-		// 	type: 'INVALID_CART',
-		// 	message: '无效的卡号'
-		// })
+		}).catch(next);
 	}
 	
 }
