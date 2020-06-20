@@ -24,8 +24,8 @@ const models = require('./models'); //数据模型
 const app = express();
 
 app.disable('etag');//处理接口缓存时会返回304
-// app.use(express.static(path.join(__dirname, 'public')));
-app.use('/public', express.static('public'));
+
+app.use(express.static('./public'));//设置静态文件目录, app.use(express.static(path.join(__dirname, 'public')));
 
 //设置跨域访问
 app.all('*', function(req, res, next) {
